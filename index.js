@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require('apollo-server')
-const { getPlayerInfoById } = require('./service')
+const { getPlayerInfoById, getCurrentSeasonByPlayerId } = require('./service')
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
@@ -25,6 +25,7 @@ const typeDefs = gql`
 		position: String
 		# career: Career
 		# seasons(seasonId: Int): [Season]
+		currentSeason: [WeekStats]
 	}
 
 	type Career {
@@ -41,14 +42,66 @@ const typeDefs = gql`
 		abbreviation: String
 	}
 
+	type WeekStats {
+		date: String
+		opponent: String
+		gameResult: String
+		passing: Passing
+		rushing: Rushing
+		receiving: Receiving
+		fumbles: Fumbles
+		defensive: Defensive
+	}
+
 	type Passing {
 		attempts: Int
 		completions: Int
 		yards: Int
+		average: Float
+		completionPercentage: Float
 		touchdowns: Int
 		long: Int
 		interceptions: Int
+		qbr: Float
+		rating: Float
+	}
+
+	type Rushing {
+		attempts: Int
+		yards: Int
+		average: Float
+		long: Int
+		touchdowns: Int
+	}
+
+	type Fumbles {
 		fumbles: Int
+		lost: Int
+	}
+
+	type Receiving {
+		receptions: Int
+		targets: Int
+		yards: Int
+		average: Float
+		long: Int
+		touchdowns: Int
+	}
+
+	type Defensive {
+		combinedTackles: Int
+		totalTackles: Int
+		assistedTackles: Int
+		sacks: Float
+		stuffs: Int
+		stuffYards: Int
+		forcedFumbles: Int
+		interceptions: Int
+		interceptionYards: Int
+		interceptionYardAverage: Int
+		interceptionYardLong: Int
+		interceptionReturnTouchdowns: Int
+		passesDefended: Int
 	}
 
 	# The "Query" type is the root of all GraphQL queries.
@@ -64,6 +117,11 @@ const resolvers = {
 	Query: {
 		player: (_, { id }) => {
 			return getPlayerInfoById(id)
+		}
+	},
+	Player: {
+		currentSeason: parent => {
+			return getCurrentSeasonByPlayerId(parent.id)
 		}
 	}
 }
