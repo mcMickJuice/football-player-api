@@ -1,11 +1,7 @@
-const fs = require('fs')
-const path = require('path')
+const { getFixtureHtml } = require('../utility')
 const { scrapePlayerInfo } = require('../../scrapers/player')
 
-const sampleHtml = fs.readFileSync(
-	path.join(__dirname, './player.fixture.html'),
-	{ encoding: 'utf8' }
-)
+const sampleHtml = getFixtureHtml('player')
 
 describe('player scraper', () => {
 	it('gets name, imageUrl', () => {
